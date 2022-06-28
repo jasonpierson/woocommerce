@@ -372,7 +372,7 @@ class ListTable extends WP_List_Table {
 	 * @return array
 	 */
 	public function default_hidden_columns( array $hidden, WP_Screen $screen ) {
-		if ( isset( $screen->id ) && 'woocommerce_page_wc-orders' === $screen->id ) {
+		if ( isset( $screen->id ) && wc_get_page_screen_id( 'shop-order' ) === $screen->id ) {
 			$hidden = array_merge(
 				$hidden,
 				array(
@@ -431,8 +431,12 @@ class ListTable extends WP_List_Table {
 			echo '<strong>#' . esc_attr( $order->get_order_number() ) . ' ' . esc_html( $buyer ) . '</strong>';
 		} else {
 			echo '<a href="#" class="order-preview" data-order-id="' . absint( $order->get_id() ) . '" title="' . esc_attr( __( 'Preview', 'woocommerce' ) ) . '">' . esc_html( __( 'Preview', 'woocommerce' ) ) . '</a>';
-			echo '<a href="' . esc_url( admin_url( 'post.php?post=' . absint( $order->get_id() ) ) . '&action=edit' ) . '" class="order-view"><strong>#' . esc_attr( $order->get_order_number() ) . ' ' . esc_html( $buyer ) . '</strong></a>';
+			echo '<a href="' . $this->get_order_edit_link( $order ) . '" class="order-view"><strong>#' . esc_attr( $order->get_order_number() ) . ' ' . esc_html( $buyer ) . '</strong></a>';
 		}
+	}
+
+	private function get_order_edit_link( WC_Order $order ) {
+		return esc_url( admin_url( 'admin.php?page=wc-orders&id=' . absint( $order->get_id() ) ) . '&action=edit' );
 	}
 
 	/**

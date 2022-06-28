@@ -6,6 +6,7 @@
  * @version 2.5.0
  */
 
+use Automattic\WooCommerce\Internal\Admin\Orders\Edit;
 use Automattic\WooCommerce\Internal\Admin\Orders\ListTable as Custom_Orders_List_Table;
 use Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController;
 
@@ -23,6 +24,8 @@ class WC_Admin_Menus {
 	 * @var Custom_Orders_List_Table
 	 */
 	private $orders_list_table;
+
+	private $order_edit_form;
 
 	/**
 	 * Hook in tabs.
@@ -315,7 +318,7 @@ class WC_Admin_Menus {
 	 * @return void
 	 */
 	public function orders_menu(): void {
-		if ( wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
+		if ( true || wc_get_container()->get( CustomOrdersTableController::class )->custom_orders_table_usage_is_enabled() ) {
 			add_submenu_page( 'woocommerce', __( 'Orders', 'woocommerce' ), __( 'Orders', 'woocommerce' ), 'edit_others_shop_orders', 'wc-orders', array( $this, 'orders_page' ) );
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'orders_table' ) );
 
@@ -346,8 +349,24 @@ class WC_Admin_Menus {
 	 * @return void
 	 */
 	public function orders_page(): void {
+		$action = $_GET['action'] ?? '';
+		switch ( $action ) {
+			case 'edit':
+				$this->edit_order_page();
+				break;
+			default:
+				$this->list_order_page();
+		}
+	}
+
+	private function list_order_page() {
 		$this->orders_list_table->prepare_items();
 		$this->orders_list_table->display();
+	}
+
+	public function edit_order_page() {
+		$this->order_edit_form = new Edit();
+		$this->order_edit_form->display();
 	}
 
 	/**
